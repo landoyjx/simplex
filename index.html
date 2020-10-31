@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>simplex</title>
+		<meta name="content-type" content="text/html" charset="UTF-8">
+		<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" charset="utf-8"></script>
+		<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.0/dist/sockjs.min.js" charset="utf-8"></script>
+		<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js" charset="utf-8"></script>
+	</head>
+	<body>
+		<script>
+			var stompClient = null;
+			$(function(){	
+				connect()
+			});
+			
+			window.onunload = function() {
+		    	disconnect()
+		    }
+			
+			function connect(){
+		        var socket = new SockJS('http://127.0.0.1:3000/market-ws');
+		        stompClient = Stomp.over(socket);
+		        stompClient.connect({},function(frame){
+		            console.log('Connected.');
+		            stompClient.subscribe('/topic/orderUpdate/1', function(response){
+		            	console.log('at client receive order update msg:');
+		            	console.dir(response);             	
+		            });
+		            
+		            stompClient.subscribe('/topic/matchUpdate/BTC_USDT', function(response){
+		            	console.log('at client receive match update msg:');
+		            	console.dir(response);             	
+		            });
+		        });
+		    }
+
+		    function disconnect(){
+		        if(stompClient != null) {
+		            stompClient.disconnect();
+		        }
+		        console.log("Disconnected.");
+		    }
+		</script>
+	</body>
+</html>
